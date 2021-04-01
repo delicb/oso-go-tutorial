@@ -16,7 +16,7 @@ type authManager struct {
 	engine oso.Oso
 }
 
-type AuthManager interface {
+type Authorizer interface {
 	Authorize(actor, action, resource interface{}) bool
 }
 
@@ -52,8 +52,8 @@ func NewAuthManager(policies string) (*authManager, error) {
 	return &authManager{engine}, nil
 }
 
-// build time guarantee that authManager implement AuthManager
-var _ AuthManager = &authManager{}
+// build time guarantee that authManager implement Authorizer
+var _ Authorizer = &authManager{}
 
 func (e *authManager) Authorize(actor, action, resource interface{}) bool {
 	allowed, err := e.engine.IsAllowed(actor, action, resource)
