@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -26,7 +25,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(db)
 
 	// prepare HTTP server
 	webApp := NewHTTPHandler(db, authManager)

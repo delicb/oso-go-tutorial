@@ -17,7 +17,7 @@ func (u User) String() string {
 }
 
 // IsAuthenticated implements logic to tell apart authenticated and guest users.
-// In this implementation, if user has email set, they are considered autenticated.
+// In this implementation, if user has email set, they are considered authenticated.
 func (u User) IsAuthenticated() bool {
 	return u.Email != ""
 }

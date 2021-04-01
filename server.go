@@ -14,7 +14,7 @@ import (
 
 // HTTPServer provides HTTP endpoints functionality
 type HTTPServer struct {
-	db *DBManager
+	db   *DBManager
 	auth *AuthManager
 }
 
@@ -22,7 +22,7 @@ type HTTPServer struct {
 // authentication and authorization built-in.
 func NewHTTPHandler(db *DBManager, auth *AuthManager) http.Handler {
 	server := &HTTPServer{
-		db: db,
+		db:   db,
 		auth: auth,
 	}
 
@@ -40,7 +40,6 @@ func NewHTTPHandler(db *DBManager, auth *AuthManager) http.Handler {
 
 func (h *HTTPServer) hello(w http.ResponseWriter, r *http.Request) {
 	user := UserFromRequest(r)
-	log.Println(user, user.IsAuthenticated())
 	if !user.IsAuthenticated() {
 		_, _ = fmt.Fprint(w, "hello guest user")
 	} else {
@@ -70,7 +69,7 @@ func (h *HTTPServer) getExpense(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expense, err := h.db.ExpenseByID(id)
-	if err !=nil {
+	if err != nil {
 		http.Error(w, "unable to find expense", http.StatusNotFound)
 		return
 	}
@@ -96,6 +95,7 @@ func (h *HTTPServer) createExpense(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unable to read provided body", http.StatusInternalServerError)
 		return
 	}
+	defer r.Body.Close()
 
 	var expense Expense
 	if err := json.Unmarshal(body, &expense); err != nil {

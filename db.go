@@ -2,10 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	_ "embed"
-)
+	"fmt"
 
+	_ "github.com/mattn/go-sqlite3"
+)
 
 //go:embed schema.sql
 var dbSchema string
@@ -25,7 +26,6 @@ func NewDBManager(file string) (*DBManager, error) {
 	// part, so this should not fail even on multiple runs
 	// TODO: maybe proper migrations support?
 	if _, err := db.Exec(dbSchema); err != nil {
-
 		return nil, fmt.Errorf("failed to create DB schema: %w", err)
 	}
 
@@ -95,9 +95,9 @@ func (m *DBManager) ExpenseByID(forID int) (Expense, error) {
 		return Expense{}, fmt.Errorf("no organization for ID %d", forID)
 	case nil:
 		return Expense{
-			ID:   id,
-			UserID: userID,
-			Amount: amount,
+			ID:          id,
+			UserID:      userID,
+			Amount:      amount,
 			Description: description,
 		}, nil
 	default:
