@@ -105,13 +105,14 @@ func (m *DBManager) ExpenseByID(forID int) (Expense, error) {
 	}
 }
 
-func (m *DBManager) CreateExpense(userID, amount int, description string) (Expense, error) {
+func (m *DBManager) CreateExpense(in Expense) (Expense, error) {
+	// TODO: error handling
 	tx, err := m.db.Begin()
 	if err != nil {
 		tx.Rollback()
 		return Expense{}, err
 	}
-	res, err := tx.Exec(`INSERT INTO expenses (amount, description, user_id) VALUES (?, ?, ?)`, amount, description, userID)
+	res, err := tx.Exec(`INSERT INTO expenses (amount, description, user_id) VALUES (?, ?, ?)`, in.Amount, in.Description, in.UserID)
 	if err != nil {
 		tx.Rollback()
 		return Expense{}, err
@@ -122,10 +123,6 @@ func (m *DBManager) CreateExpense(userID, amount int, description string) (Expen
 		return Expense{}, err
 	}
 	tx.Commit()
-	return Expense{
-		ID:          int(expenseID),
-		UserID:      userID,
-		Amount:      amount,
-		Description: description,
-	}, nil
+	in.ID = int(expenseID)
+	return in, nil
 }

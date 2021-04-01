@@ -112,8 +112,14 @@ func (h *HTTPServer) createExpense(w http.ResponseWriter, r *http.Request) {
 	}
 	expense.UserID = UserFromRequest(r).ID
 
-	// TODO: Save expense
-	log.Printf("Would save expense %v", expense)
+	if ex, err := h.db.CreateExpense(expense); err != nil {
+		http.Error(w, "failed saving expense", http.StatusInternalServerError)
+		return
+	} else {
+		// redirect to expense that was just created
+		http.Redirect(w, r, fmt.Sprintf("/expenses/%d", ex.ID), http.StatusTemporaryRedirect)
+		return
+	}
 }
 
 // middlewares
