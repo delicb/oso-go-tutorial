@@ -14,3 +14,17 @@ web server, implementing an expenses application.
 
 We have already partially implemented the core functionality;
 some is left for you to complete.
+
+## Libs
+On purpose, only small number of external dependencies is used, to
+keep things simple. 
+
+For database, only sqlite3 drive is used, no ORM.
+
+Stdlib HTTP functionalities are used, but with addition of [Chi router](https://github.com/go-chi/chi)
+to make middlewares and URL parameters easier to implement. 
+
+Of course, [OSO](https://github.com/osohq/go-oso) library is used to perform
+authorization. 
+
+Utility wise, [Uber multierr](https://github.com/uber-go/multierr) package is used. 
