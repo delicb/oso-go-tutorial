@@ -4,12 +4,21 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"testing"
 )
 
-func getManager(t *testing.T) *AuthManager {
+func getManager(t *testing.T) *authManager {
 	t.Helper()
-	manager, err := NewAuthManager()
+	// load production policy, since that is the one we want to test here
+	// this also checks that authorization.polar is in a good shape, since during
+	// the build it is only embedded
+	policy, err := os.ReadFile("./authorization.polar")
+	if err != nil {
+		t.Fatalf("failed to read authorization.polar policy file")
+		return nil
+	}
+	manager, err := NewAuthManager(string(policy))
 	if err != nil {
 		t.Fatalf("failed to create auth manager: %v", err)
 		return nil

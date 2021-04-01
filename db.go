@@ -8,41 +8,50 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//go:embed schema.sql
-var dbSchema string
+type DBManager interface {
+	UserByID(int) (User, error)
+	UserByEmail(string) (User, error)
+	OrganizationByID(int) (Organization, error)
+	ExpenseByID(int) (Expense, error)
+	CreateExpense(Expense) (Expense, error)
+}
 
-type DBManager struct {
+type dBManager struct {
 	db *sql.DB
 }
 
-func NewDBManager(file string) (*DBManager, error) {
-	db, err := sql.Open("sqlite3", file)
+// NewDBManager returns an instance of dBManager connected to a database
+// defined with provided dsn
+func NewDBManager(dsn string) (*dBManager, error) {
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
 	db.SetMaxOpenConns(1)
 
-	// prepare schema, all create table statements should have "if not exists"
-	// part, so this should not fail even on multiple runs
-	// TODO: maybe proper migrations support?
-	if _, err := db.Exec(dbSchema); err != nil {
-		return nil, fmt.Errorf("failed to create DB schema: %w", err)
-	}
-
-	return &DBManager{db}, nil
+	return &dBManager{db}, nil
 }
 
-func (m *DBManager) UserByEmail(forEmail string) (User, error) {
+// rawExec is used for initialization (e.g. poor man's migration management)
+// or preparing data for tests
+func (m *dBManager) rawExec(sql string) error {
+	if _, err := m.db.Exec(sql); err != nil {
+		return fmt.Errorf("failed to execute sql: %w", err)
+	}
+	return nil
+}
+
+func (m *dBManager) UserByEmail(forEmail string) (User, error) {
 	row := m.db.QueryRow(`SELECT id, email, title, organization_id FROM users WHERE email = ?`, forEmail)
 	return m.constructUser(row)
 }
 
-func (m *DBManager) UserByID(id int) (User, error) {
+func (m *dBManager) UserByID(id int) (User, error) {
 	row := m.db.QueryRow(`SELECT id, email, title, organization_id FROM users WHERE id = ?`, id)
 	return m.constructUser(row)
 }
 
-func (m *DBManager) constructUser(row *sql.Row) (User, error) {
+func (m *dBManager) constructUser(row *sql.Row) (User, error) {
 	var id int
 	var email string
 	var title string
@@ -63,7 +72,7 @@ func (m *DBManager) constructUser(row *sql.Row) (User, error) {
 	}
 }
 
-func (m *DBManager) OrganizationByID(forID int) (Organization, error) {
+func (m *dBManager) OrganizationByID(forID int) (Organization, error) {
 	var id int
 	var name string
 
@@ -82,7 +91,7 @@ func (m *DBManager) OrganizationByID(forID int) (Organization, error) {
 	}
 }
 
-func (m *DBManager) ExpenseByID(forID int) (Expense, error) {
+func (m *dBManager) ExpenseByID(forID int) (Expense, error) {
 	var id int
 	var userID int
 	var amount int
@@ -105,7 +114,7 @@ func (m *DBManager) ExpenseByID(forID int) (Expense, error) {
 	}
 }
 
-func (m *DBManager) CreateExpense(in Expense) (Expense, error) {
+func (m *dBManager) CreateExpense(in Expense) (Expense, error) {
 	// TODO: error handling
 	tx, err := m.db.Begin()
 	if err != nil {
@@ -126,3 +135,6 @@ func (m *DBManager) CreateExpense(in Expense) (Expense, error) {
 	in.ID = int(expenseID)
 	return in, nil
 }
+
+// build time guarantee that dbManager implement DBManager
+var _ DBManager = &dBManager{}

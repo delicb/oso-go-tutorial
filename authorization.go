@@ -12,14 +12,15 @@ import (
 	"go.uber.org/multierr"
 )
 
-//go:embed authorization.polar
-var osoPolicy string
-
-type AuthManager struct {
+type authManager struct {
 	engine oso.Oso
 }
 
-func NewAuthManager() (*AuthManager, error) {
+type AuthManager interface {
+	Authorize(actor, action, resource interface{}) bool
+}
+
+func NewAuthManager(policies string) (*authManager, error) {
 	engine, err := oso.NewOso()
 	if err != nil {
 		return nil, fmt.Errorf("creating OSO engine: %w", err)
@@ -44,14 +45,17 @@ func NewAuthManager() (*AuthManager, error) {
 	}
 
 	// load policy
-	if err := engine.LoadString(osoPolicy); err != nil {
+	if err := engine.LoadString(policies); err != nil {
 		return nil, fmt.Errorf("loading policies: %w", err)
 	}
 
-	return &AuthManager{engine}, nil
+	return &authManager{engine}, nil
 }
 
-func (e *AuthManager) Authorize(actor, action, resource interface{}) bool {
+// build time guarantee that authManager implement AuthManager
+var _ AuthManager = &authManager{}
+
+func (e *authManager) Authorize(actor, action, resource interface{}) bool {
 	allowed, err := e.engine.IsAllowed(actor, action, resource)
 	// if we got any error, we interpret that as not-authorized, but we log an error for debugging
 	// since in normal operation we should get no-error and true/false
@@ -61,7 +65,6 @@ func (e *AuthManager) Authorize(actor, action, resource interface{}) bool {
 	}
 	return allowed
 }
-
 
 // Lib holds utility functions that might be useful for evaluating policies
 type Lib struct{}

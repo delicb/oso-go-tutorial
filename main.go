@@ -9,9 +9,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// dbSchema contains SQL statements needed to initialize database on first start
+//go:embed schema.sql
+var dbSchema string
+
+// osaPolicy contains permission policies defined in external file
+//go:embed authorization.polar
+var osoPolicy string
+
 func main() {
 	// prepare OSO
-	authManager, err := NewAuthManager()
+	authManager, err := NewAuthManager(osoPolicy)
 	if err != nil {
 		panic(err)
 	}
@@ -23,6 +31,9 @@ func main() {
 	}
 	db, err := NewDBManager(dbName)
 	if err != nil {
+		panic(err)
+	}
+	if err := db.rawExec(dbSchema); err != nil {
 		panic(err)
 	}
 

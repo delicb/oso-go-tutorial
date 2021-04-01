@@ -14,13 +14,13 @@ import (
 
 // HTTPServer provides HTTP endpoints functionality
 type HTTPServer struct {
-	db   *DBManager
-	auth *AuthManager
+	db   DBManager
+	auth AuthManager
 }
 
 // NewHTTPHandler returns handler that serves all HTTP endpoints with
 // authentication and authorization built-in.
-func NewHTTPHandler(db *DBManager, auth *AuthManager) http.Handler {
+func NewHTTPHandler(db DBManager, auth AuthManager) http.Handler {
 	server := &HTTPServer{
 		db:   db,
 		auth: auth,
@@ -145,7 +145,7 @@ func UserFromRequest(r *http.Request) User {
 // Authenticate checks if user provided in "User" header exists
 // and attaches instances of a user to context for next handler
 // in chain to use
-func Authenticate(db *DBManager) func(http.Handler) http.Handler {
+func Authenticate(db DBManager) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			userEmail := r.Header.Get("user")
@@ -162,7 +162,7 @@ func Authenticate(db *DBManager) func(http.Handler) http.Handler {
 // Authenticate checks if user provided in "User" header exists
 // and attaches instances of a user to context for next handler
 // in chain to use
-func Authorize(auth *AuthManager) func(http.Handler) http.Handler {
+func Authorize(auth AuthManager) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			user := UserFromRequest(r)
