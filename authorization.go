@@ -19,7 +19,7 @@ type AuthManager struct {
 	engine oso.Oso
 }
 
-func NewAuthorizationEngine() (*AuthManager, error) {
+func NewAuthManager() (*AuthManager, error) {
 	engine, err := oso.NewOso()
 	if err != nil {
 		return nil, fmt.Errorf("creating OSO engine: %w", err)

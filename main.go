@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// prepare OSO
-	authManager, err := NewAuthorizationEngine()
+	authManager, err := NewAuthManager()
 	if err != nil {
 		panic(err)
 	}
