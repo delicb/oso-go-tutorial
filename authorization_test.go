@@ -18,7 +18,7 @@ func getManager(t *testing.T) *authManager {
 		t.Fatalf("failed to read authorization.polar policy file")
 		return nil
 	}
-	manager, err := NewAuthManager(string(policy))
+	manager, err := NewAuthorizer(string(policy))
 	if err != nil {
 		t.Fatalf("failed to create auth manager: %v", err)
 		return nil

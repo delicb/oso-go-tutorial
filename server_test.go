@@ -97,8 +97,6 @@ func TestAuthenticate_HasUser(t *testing.T) {
 			req, _ := http.NewRequest(http.MethodGet, "/", nil)
 			authenticator(userRecorderHandler(&recordedUser)).ServeHTTP(nil, req)
 
-			t.Log(recordedUser)
-
 			if recordedUser.Email != d.expectedEmail {
 				t.Fatalf("unexpected email, expected %q, got %q", d.expectedEmail, recordedUser.Email)
 			}

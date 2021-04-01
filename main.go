@@ -19,7 +19,7 @@ var osoPolicy string
 
 func main() {
 	// prepare OSO
-	authManager, err := NewAuthManager(osoPolicy)
+	authManager, err := NewAuthorizer(osoPolicy)
 	if err != nil {
 		panic(err)
 	}
