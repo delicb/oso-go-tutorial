@@ -8,5 +8,3 @@ require (
 	github.com/osohq/go-oso v0.11.3
 	go.uber.org/multierr v1.6.0
 )
-
-replace github.com/osohq/go-oso => ../oso/languages/go
