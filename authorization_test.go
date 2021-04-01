@@ -158,5 +158,47 @@ func TestExpenseAuth(t *testing.T) {
 			}
 		})
 	}
+}
+
+type organizationsRequest struct {
+	expectedAllow bool
+	user          User
+	action        string
+	organization  Organization
+}
+
+func TestOrganizationsAuth(t *testing.T) {
+	manager := getManager(t)
+
+	data := []organizationsRequest{
+		{
+			true,
+			User{ID: 1, OrganizationID: 1},
+			"read",
+			Organization{ID: 1, Name: "org"},
+		},
+		{
+			false,
+			User{ID: 1, OrganizationID: 1},
+			"write",
+			Organization{ID: 1, Name: "org"},
+		},
+		{
+			false,
+			User{ID: 1, OrganizationID: 2},
+			"write",
+			Organization{ID: 1, Name: "org"},
+		},
+	}
+
+	for _, d := range data {
+		d := d
+		t.Run(fmt.Sprintf("user %d - %s - organiation %d", d.user.ID, d.action, d.organization.ID), func(t *testing.T) {
+			allow := manager.Authorize(d.user, d.action, d.organization)
+			if allow != d.expectedAllow {
+				t.Errorf("got auth resolution %v, expected %v", allow, d.expectedAllow)
+			}
+		})
+	}
 
 }

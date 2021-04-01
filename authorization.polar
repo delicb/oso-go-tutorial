@@ -26,6 +26,6 @@ submitted(user: User, expense: Expense) if
     user.ID = expense.UserID;
 
 ### Organization rules
-#allow_by_path(_user, "GET", "organizations", _rest);
-#allow(user: User, "read", organization: Organization) if
-#    user.organization_id = organization.id;
+allow_by_path(_user, "GET", "organizations", _rest);
+allow(user: User, "read", organization: Organization) if
+    user.OrganizationID = organization.ID;

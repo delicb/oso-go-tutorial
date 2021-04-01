@@ -32,6 +32,7 @@ func NewHTTPHandler(db DBManager, auth Authorizer) http.Handler {
 
 	mux.Put(`/expenses/submit`, server.createExpense)
 	mux.Get(`/expenses/{id:[0-9]+}`, server.getExpense)
+	mux.Get(`/organizations/{id:[0-9]+}`, server.getOrganization)
 	mux.Get(`/whoami`, server.whoami)
 	mux.Get("/", server.hello)
 
@@ -120,6 +121,32 @@ func (h *HTTPServer) createExpense(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/expenses/%d", ex.ID), http.StatusTemporaryRedirect)
 		return
 	}
+}
+
+func (h *HTTPServer) getOrganization(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "invalid organization ID", http.StatusBadRequest)
+		return
+	}
+
+	organization, err := h.db.OrganizationByID(id)
+	if err != nil {
+		http.Error(w, "unable to find organization", http.StatusNotFound)
+		return
+	}
+
+	if allowed := h.auth.Authorize(UserFromRequest(r), "read", organization); !allowed {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
+	payload, err := json.Marshal(organization)
+	if err != nil {
+		http.Error(w, "failed to marshal json", http.StatusInternalServerError)
+		return
+	}
+	_, _ = w.Write(payload)
 }
 
 // middlewares
