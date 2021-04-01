@@ -112,9 +112,9 @@ func statusCodeHandler(statusCode int) http.Handler {
 }
 
 func TestAuthorize(t *testing.T) {
-	data := []struct{
-		name string
-		allow bool
+	data := []struct {
+		name               string
+		allow              bool
 		expectedStatusCode int
 	}{
 		{

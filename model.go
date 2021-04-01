@@ -43,4 +43,3 @@ type Expense struct {
 func (e Expense) String() string {
 	return fmt.Sprintf("<Expense: %d (amount: %d, user: %d)>", e.ID, e.Amount, e.UserID)
 }
-

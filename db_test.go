@@ -42,8 +42,8 @@ func getDBManager(t *testing.T, dataFiles ...string) *dBManager {
 func TestDBManager_UserByID(t *testing.T) {
 	manager := getDBManager(t, "testdata/test.sql")
 
-	data := []struct{
-		id int
+	data := []struct {
+		id           int
 		expectToFind bool
 	}{
 		{1, true},
@@ -63,7 +63,7 @@ func TestDBManager_UserByID(t *testing.T) {
 				if u.ID != d.id {
 					t.Fatalf("unexpected user ID, got: %d, expected: %d", u.ID, d.id)
 				}
-			}else {
+			} else {
 				if err == nil {
 					t.Fatalf("did not expect to find user, but got: %v", u)
 				}
