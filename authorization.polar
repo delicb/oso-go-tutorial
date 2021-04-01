@@ -10,8 +10,6 @@ allow(_user: User, "GET", request: Request) if
 allow(user, action, request: Request) if
    Lib.Split(request.URL.Path, "/") = [_, stem, *rest]
    and allow_by_path(user, action, stem, rest);
-#    request.URL.Path.split("/") = [_, stem, *rest]
-#    and allow_by_path(user, action, stem, rest);
 
 ### Expense rules
 
