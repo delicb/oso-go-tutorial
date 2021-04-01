@@ -17,7 +17,8 @@ allow(user, action, request: Request) if
 
 # by HTTP method
 allow_by_path(_user, "GET", "expenses", _rest);
-allow_by_path(_user, "PUT", "expenses", ["submit"]);
+allow_by_path(user, "PUT", "expenses", ["submit"]) if
+    user.IsAuthenticated();
 
 # by model
 allow(user: User, "read", expense: Expense) if
