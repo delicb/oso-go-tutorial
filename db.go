@@ -3,7 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	_ "embed"
 )
+
+
+//go:embed schema.sql
+var dbSchema string
 
 type DBManager struct {
 	db *sql.DB

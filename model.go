@@ -16,11 +16,10 @@ func (u User) String() string {
 	return fmt.Sprintf("<User: %s (id: %d)>", u.Email, u.ID)
 }
 
-// Anonymous user
-type Guest struct{}
-
-func (g Guest) String() string {
-	return "<User: Guest>"
+// IsAuthenticated implements logic to tell apart authenticated and guest users.
+// In this implementation, if user has email set, they are considered autenticated.
+func (u User) IsAuthenticated() bool {
+	return u.Email != ""
 }
 
 // Organization model
