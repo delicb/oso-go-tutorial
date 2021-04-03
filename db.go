@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
+	"go.uber.org/multierr"
 )
 
 type DBManager interface {
@@ -125,24 +126,32 @@ func (m *dBManager) ExpenseByID(forID int) (Expense, error) {
 	}
 }
 
-func (m *dBManager) CreateExpense(in Expense) (Expense, error) {
+func (m *dBManager) CreateExpense(in Expense) (e Expense, err error) {
 	// TODO: error handling
 	tx, err := m.db.Begin()
 	if err != nil {
-		tx.Rollback()
 		return Expense{}, err
 	}
+
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			if rollbackErr != nil {
+				err = multierr.Combine(err, rollbackErr)
+			}
+			return
+		}
+		err = tx.Commit()
+	}()
+
 	res, err := tx.Exec(`INSERT INTO expenses (amount, description, user_id) VALUES (?, ?, ?)`, in.Amount, in.Description, in.UserID)
 	if err != nil {
-		tx.Rollback()
 		return Expense{}, err
 	}
 	expenseID, err := res.LastInsertId()
 	if err != nil {
-		tx.Rollback()
 		return Expense{}, err
 	}
-	tx.Commit()
 	in.ID = int(expenseID)
 	return in, nil
 }
