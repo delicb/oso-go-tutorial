@@ -7,7 +7,7 @@ allow(_user: User, "GET", request: Request) if
     request.URL.Path = "/whoami";
 
 # Allow by path segment
-allow(user, action, request: Request) if
+allow(user: User, action, request: Request) if
    Lib.Split(request.URL.Path, "/") = [_, stem, *rest]
    and allow_by_path(user, action, stem, rest);
 
@@ -15,7 +15,7 @@ allow(user, action, request: Request) if
 
 # by HTTP method
 allow_by_path(_user, "GET", "expenses", _rest);
-allow_by_path(user, "PUT", "expenses", ["submit"]) if
+allow_by_path(user: User, "PUT", "expenses", ["submit"]) if
     user.IsAuthenticated();
 
 # by model
