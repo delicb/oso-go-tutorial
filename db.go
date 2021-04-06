@@ -127,7 +127,6 @@ func (m *dBManager) ExpenseByID(forID int) (Expense, error) {
 }
 
 func (m *dBManager) CreateExpense(in Expense) (e Expense, err error) {
-	// TODO: error handling
 	tx, err := m.db.Begin()
 	if err != nil {
 		return Expense{}, err
