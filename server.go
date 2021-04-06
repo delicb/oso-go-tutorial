@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5/middleware"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -27,6 +29,8 @@ func NewHTTPHandler(db DBManager, auth Authorizer) http.Handler {
 	}
 
 	mux := chi.NewMux()
+	mux.Use(middleware.Recoverer)
+	mux.Use(middleware.Logger)
 	mux.Use(Authenticate(db))
 	mux.Use(Authorize(auth))
 
