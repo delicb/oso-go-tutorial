@@ -41,6 +41,10 @@ func main() {
 	webApp := NewHTTPHandler(db, authManager)
 
 	// run server
-	log.Fatal(http.ListenAndServe("127.0.0.1:8000", webApp))
-
+	listenOn := os.Getenv("EXPENSES_LISTEN_ON")
+	if listenOn == "" {
+		listenOn = "127.0.0.1:8000"
+	}
+	log.Printf("Starting HTTP server on %s", listenOn)
+	log.Fatal(http.ListenAndServe(listenOn, webApp))
 }
