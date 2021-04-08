@@ -63,6 +63,7 @@ func (h *HTTPServer) whoami(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to fetch organization", http.StatusInternalServerError)
 		return
 	}
+
 	_, _ = fmt.Fprintf(w, "You are %s, the %s at %s", user.Email, user.Title, organization.Name)
 }
 
@@ -161,7 +162,7 @@ type ctxKey string
 // context key for user in context
 const userKey ctxKey = "user"
 
-// UserFromContext returns user that is attached to a context.
+// UserFromRequest returns user that is attached to a context.
 // Note that user instance is always returned, but it might be empty
 // for non-authorized users. User should call IsAuthenticated method on
 // user in order to check if user is authenticated.
@@ -190,9 +191,9 @@ func Authenticate(db DBManager) func(http.Handler) http.Handler {
 	}
 }
 
-// Authenticate checks if user provided in "User" header exists
-// and attaches instances of a user to context for next handler
-// in chain to use
+// Authorize is a middleware for checking if currently logged in user
+// (from context) has a permission to send request to a path and returns
+// 403 Forbidden in not.
 func Authorize(auth Authorizer) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

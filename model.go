@@ -4,7 +4,8 @@ import (
 	"fmt"
 )
 
-// Logged in user. Has an email address.
+// User is model representing user in database, HTTP and auth.
+// Empty user is valid, but considered unauthenticated.
 type User struct {
 	ID             int
 	Email          string
