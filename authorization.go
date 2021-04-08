@@ -22,7 +22,7 @@ type Authorizer interface {
 	Authorize(actor, action, resource interface{}) bool
 }
 
-// Returns new instance of authorizer.
+// NewAuthorizer returns new instance of authorizer.
 // Uses OSO as a backed. In order for returned authorizer to be capable
 // of making decisions, set of polar policies should be passed as parameter.
 // Domain types are registered and some utility stuff (like http.Request and
